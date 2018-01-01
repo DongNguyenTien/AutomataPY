@@ -107,3 +107,9 @@
       - ELSE return false
 # Using
   - Language : Python3
+  -	Put file automata.py, data1.xml in same directory
+	- open terminal, 
+		-	run command: cd to directory which has file automata.py
+		-	run cmd: $ python automata.py
+	- check result in output.xml
+	- Just can adjust term input only in automata.py (input_string)

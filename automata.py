@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as ET
 import re 
-input_string = "country(rank,year,gdppc,dm(minh,tri),neighbor,neighbor)||country(rank,year,gdppc,neighbor,neighbor) "
-input_string = input_string.split('||')
+#input_string = "country(rank,year,gdppc,dm(minh,tri),neighbor,neighbor)||country(rank,year,gdppc,neighbor,neighbor) "
+#input_string = "check(check1(check2),check3(check4,check5))"
+#input_string = input_string.split('||')
 
 #string = "country.rank > 50"
 #query =query.partition("(")
@@ -17,14 +18,16 @@ def alpha(query):
 	alphabet= {}
 	check = []
 	final_states = []
-	symbols = re.findall(r"[A-Za-z]+", query)
-	query = re.findall(r"[A-Za-z]+|\(|\)", query)
+	symbols = re.findall(r"[A-Za-z0-9]+", query)
+	query = re.findall(r"[A-Za-z0-9]+|\(|\)", query)
 	while (len(query)>0):
 		symbol = query.pop()
+		#print (symbol)
 		if (symbol != '('):
 			s.append(symbol)
 		if (symbol == '('):
 			k = []
+			#print (query[-1])
 			k.append(query[-1])
 			while (s[-1] !=')'):
 				k.append(s.pop())
@@ -38,16 +41,16 @@ def alpha(query):
 				alphabet[symbol]=len(final[check.index(symbol)])-1
 			else :
 				alphabet[symbol]=0
-	#print(alphabet)
+	###print(alphabet)
 	return(alphabet)
 
 def cre_auto(query):
 	alphabet = alpha(query)
-	symbols = re.findall(r"[A-Za-z]+", query)
+	symbols = re.findall(r"[A-Za-z0-9]+", query)
 	s = []
 	a = list(alphabet.values())
 	auto = {}
-	#print (alphabet)
+	###print (alphabet)
 	auto['alphabet'] = alphabet
 	final_states = []
 	trans = [[]for i in range(0,max(a)+1)]
@@ -102,16 +105,16 @@ def check(auto,term):
 	try:
 	    symbols = term
 	    #auto = cre_auto(query)
-	    #print (auto)
+	    ###print (auto)
 	    transitions = auto['trans']
 	    alpha = auto['alphabet']
-	    print (alpha)
+	    ##print (alpha)
 	    final_states = auto['final_states']
 	    s_states = [[]]
 	    while len(symbols)> 0:
 	      minh_states = []
 	      symbol = symbols.pop()
-	      #print (symbol)
+	      ###print (symbol)
 	      t =[]
 	      s = []
 	      #lay prevstates ra
@@ -125,7 +128,7 @@ def check(auto,term):
 	          # (t)
 	        else :
 	          p_states = []
-	          print (s_state)
+	          ##print (s_state)
 	          for i in range(0,alpha[symbol]):
 	            p_states.append(s_state.pop())
 	          t=trans(transitions[alpha[symbol]],symbol,p_states) 
@@ -156,33 +159,54 @@ def check(auto,term):
 	          return True
 	    return False
 	except:
-		print('opps')
+		#print('opps')
 		return False
 
+#input_string = input_string.split('||')
+def run():
+	input_string = "country(rank,year,gdppc,ten(minh,tri),neighbor,neighbor)"
 
-#def xmlparse(file_name):
-output = open('output.xml','w')
-output.write('<result>')
-print(input_string)
-for s in input_string:
-	symbols = re.findall(r"[A-Za-z]+", s)
-	auto = cre_auto(s)
-	file = open('data1.xml','r')
-	#except :
-		# ("Oops!")
-	#	return False
-	tree = ET.parse(file)
-	print(symbols[0])
-	p =tree.getroot().findall('.//'+symbols[0])
-	
-	for k in p: 
-		t = [elem.tag for elem in k.iter()]
-		if (check(auto,t)):
-			output.write(ET.tostring(k))
-output.write('</result>')
-output.close()
+	input_string = input_string.split('||')
+	output = open('output.xml','w')
+	output.write('<result>')
+	##print(input_string)
+	for s in input_string:
+		symbols = re.findall(r"[A-Za-z0-9]+", s)
+		auto = cre_auto(s)
+		#print(auto)
+		#print (auto)
+		file = open('data1.xml','r')
+		#except :
+			# ("Oops!")
+		#	return False
+		tree = ET.parse(file)
+		##print(symbols[0])
+		p =tree.getroot().findall('.//'+symbols[0])
+		#print(symbols[0])
+		#print(p)
 		
-
+		for k in p: 
+			heheh = k.iter()
+			#print ("-------------------")
+			alpha = {}
+			for c in heheh:
+				alpha[c.tag] = len(list(c))
+			#print(alpha)
+			try:
+				for key in alpha:
+					if auto['alphabet'][key] != alpha[key]:
+						
+						continue
+			except:
+				continue
+			t = [elem.tag for elem in k.iter()]
+			#print (t)
+			if (check(auto,t)):
+				output.write(ET.tostring(k))
+	output.write('</result>')
+	output.close()
+		
+run()
 #result.write('output.xml')
-#print(p)
+###print(p)
 		
